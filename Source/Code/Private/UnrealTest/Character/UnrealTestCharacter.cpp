@@ -23,8 +23,26 @@ AUnrealTestCharacter::AUnrealTestCharacter()
 	SetCameraBoom();
 	SetFollowCamera();
 
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AUnrealTestCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
+	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = this;
+	
+	Weapon = GetWorld()->SpawnActor<AWeaponBase>(Weapon_BP, SpawnParameters);
+	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+
+	HealthComponent->OnHealthChanged.AddDynamic(this, &AUnrealTestCharacter::OnHealthChanged);
 }
 
 void AUnrealTestCharacter::DisableCotrollerRotation()
@@ -67,16 +85,7 @@ void AUnrealTestCharacter::SetFollowCamera()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 }
 
-void AUnrealTestCharacter::BeginPlay()
+void AUnrealTestCharacter::OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageTyp, FName BoneName, AController* InstigatedBy, AActor* DamageCauser)
 {
-	Super::BeginPlay();
-
 	
-	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = this;
-	
-	Weapon = GetWorld()->SpawnActor<AWeaponBase>(Weapon_BP, SpawnParameters);
-	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 }

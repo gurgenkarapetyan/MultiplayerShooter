@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "UnrealTest/Components/HealthComponent.h"
 #include "UnrealTest/Items/Weapons/WeaponBase.h"
 #include "UnrealTestCharacter.generated.h"
 
@@ -14,6 +15,8 @@ class AUnrealTestCharacter : public ACharacter
 
 public:
 	AUnrealTestCharacter();
+
+	virtual void BeginPlay() override;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -26,7 +29,7 @@ public:
 	void ConfigureCharacterMovement(class UCharacterMovementComponent* characterMovement);
 	void SetCameraBoom();
 	void SetFollowCamera();
-
+	
 	const float JUMP_Z_VELOCITY= 700.f;
 	const float AIR_CONTROL = 0.35f;
 	const float MAX_WALK_SPEED = 500.f;
@@ -34,7 +37,8 @@ public:
 	const float BRAKING_DECELERATION_WALKING = 2000.f;
 
 protected:
-	virtual void BeginPlay() override;
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, FName BoneName, AController* InstigatedBy, AActor* DamageCauser);
 
 private:
 	/** Camera boom positioning the camera behind the character */
@@ -44,6 +48,9 @@ private:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UHealthComponent> HealthComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeaponBase> Weapon_BP;
