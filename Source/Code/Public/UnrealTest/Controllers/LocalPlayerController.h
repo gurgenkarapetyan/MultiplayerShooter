@@ -23,6 +23,7 @@ public:
 	void MovementBinding();
 	void TurnBinding();
 	void LookUpBinding();
+	void Fire();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -50,12 +51,14 @@ protected:
 	*/
 	void LookUpAtRate(float Rate);
 
-private:
+	void FireBinding();
+	
+protected:
 	UPROPERTY()
 	TObjectPtr<AUnrealTestCharacter> PossessedCharacter; 
 	
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
 	float TurnRateGamepad;
 	
 	const float TURN_RATE_GAMEPAD = 50.f;

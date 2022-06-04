@@ -15,6 +15,9 @@ ALocalPlayerController::ALocalPlayerController()
 void ALocalPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// PossessedCharacter = Cast<AUnrealTestCharacter>(GetPoss());
+
 	
 	PossessedCharacter = Cast<AUnrealTestCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	check(PossessedCharacter);
@@ -33,6 +36,8 @@ void ALocalPlayerController::SetupInputComponent()
 
 	TurnBinding();
 	LookUpBinding();
+	
+	FireBinding();
 }
 
 void ALocalPlayerController::JumpBinding()
@@ -60,6 +65,19 @@ void ALocalPlayerController::LookUpBinding()
 {
 	InputComponent->BindAxis("Look Up / Down Mouse", this, &ALocalPlayerController::AddPitchInput);
 	InputComponent->BindAxis("Look Up / Down Gamepad", this, &ALocalPlayerController::LookUpAtRate);
+}
+
+void ALocalPlayerController::FireBinding()
+{
+	InputComponent->BindAction("Fire", IE_Pressed, this, &ALocalPlayerController::Fire);
+}
+
+
+void ALocalPlayerController::Fire()
+{
+	check(PossessedCharacter);
+	check(PossessedCharacter->GetWeapon());
+	PossessedCharacter->GetWeapon()->Fire();
 }
 
 void ALocalPlayerController::TurnAtRate(float Rate)

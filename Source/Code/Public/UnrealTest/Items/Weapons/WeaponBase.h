@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "WeaponBase.generated.h"
 
+class AUnrealTestCharacter;
 class UBoxComponent;
 class UWidgetComponent;
 class USphereComponent;
@@ -21,12 +22,11 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
+	
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
-	
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return  ItemMesh; }
-	
+
+	void Fire();
 	
 protected:
 	// Called when the game starts or when spawned
@@ -40,17 +40,23 @@ protected:
 	UFUNCTION()
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	TPair<FVector, FVector> GetCameraTrace() const;
+	FVector GetCameraTraceHitLocation();
+	TPair<FVector, FVector> GetWeaponTrace();
+
+protected:
+	UPROPERTY()
+	TObjectPtr<AUnrealTestCharacter> WeaponOwner;
+	
 private:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Root;
+	
 	/** Skeleton mesh for the item. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Properties", meta = (AllowPrivateAccess="true"))
-	USkeletalMeshComponent* ItemMesh;
+	TObjectPtr<USkeletalMeshComponent> ItemMesh;
 	
 	/** Line trace collides with box to show HUD widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Properties", meta = (AllowPrivateAccess="true"))
-	UBoxComponent* CollisionBox;
-	
-
-	/** Enable item tracing when overlapped. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Properties", meta = (AllowPrivateAccess="true"))
-	USphereComponent* AreaSphere;
+	TObjectPtr<UBoxComponent> CollisionBox;
 };

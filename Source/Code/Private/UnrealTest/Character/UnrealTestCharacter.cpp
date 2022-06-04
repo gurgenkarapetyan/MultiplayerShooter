@@ -66,3 +66,17 @@ void AUnrealTestCharacter::SetFollowCamera()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 }
+
+void AUnrealTestCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
+	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = this;
+	
+	Weapon = GetWorld()->SpawnActor<AWeaponBase>(Weapon_BP, SpawnParameters);
+	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+}
