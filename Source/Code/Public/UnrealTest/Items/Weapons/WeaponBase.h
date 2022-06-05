@@ -21,9 +21,6 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponBase();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
 	FORCEINLINE UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return  ItemMesh; }
 
@@ -47,6 +44,12 @@ protected:
 	UFUNCTION()
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartFire();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopFire();
+	
 	TPair<FVector, FVector> GetCameraTrace() const;
 	FVector GetCameraTraceHitLocation();
 	TPair<FVector, FVector> GetWeaponTrace();
@@ -97,7 +100,6 @@ private:
 	
 	/** True when we can fire. False waiting for the timer. */
 	bool bShouldFire;
-
 	
 	/** Rate of automatic gun fire. */
 	float AutomaticFireRate;

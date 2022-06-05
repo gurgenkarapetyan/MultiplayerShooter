@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AUnrealTestCharacter
@@ -36,13 +37,16 @@ void AUnrealTestCharacter::BeginPlay()
 	
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
 
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = this;
+	if (GetLocalRole() == ROLE_Authority && Weapon_BP)
+	{
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
 	
-	Weapon = GetWorld()->SpawnActor<AWeaponBase>(Weapon_BP, SpawnParameters);
-	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
+		Weapon = GetWorld()->SpawnActor<AWeaponBase>(Weapon_BP, SpawnParameters);
+		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
 
-	HealthComponent->OnHealthChanged.AddDynamic(this, &AUnrealTestCharacter::OnHealthChanged);
+		HealthComponent->OnHealthChanged.AddDynamic(this, &AUnrealTestCharacter::OnHealthChanged);
+	}
 }
 
 void AUnrealTestCharacter::DisableCotrollerRotation()
@@ -83,6 +87,13 @@ void AUnrealTestCharacter::SetFollowCamera()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+}
+
+void AUnrealTestCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AUnrealTestCharacter, Weapon);
 }
 
 void AUnrealTestCharacter::OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageTyp, FName BoneName, AController* InstigatedBy, AActor* DamageCauser)

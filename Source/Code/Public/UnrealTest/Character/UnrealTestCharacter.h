@@ -34,6 +34,9 @@ public:
 	void ConfigureCharacterMovement(class UCharacterMovementComponent* characterMovement);
 	void SetCameraBoom();
 	void SetFollowCamera();
+
+	/** Property replication */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	const float JUMP_Z_VELOCITY= 700.f;
 	const float AIR_CONTROL = 0.35f;
@@ -60,7 +63,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeaponBase> Weapon_BP;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AWeaponBase> Weapon;
 	
 	/** Ammount of ammo charecter carries. */

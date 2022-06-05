@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 #include "UnrealTest/Character/UnrealTestCharacter.h"
 #include "UnrealTest/Controllers/LocalPlayerController.h"
 
@@ -20,8 +21,10 @@ AWeaponBase::AWeaponBase()
 	, MagazineCapacity(30)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	SetReplicates(true);
+	
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
 
@@ -43,14 +46,13 @@ void AWeaponBase::BeginPlay()
 	check(WeaponOwner);
 }
 
-// Called every frame
-void AWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AWeaponBase::StartFire()
 {
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerStartFire();
+	}
+	
 	if (!bShouldFire)
 	{
 		bShouldFire = true;
@@ -58,13 +60,38 @@ void AWeaponBase::StartFire()
 	}
 }
 
+void AWeaponBase::ServerStartFire_Implementation()
+{
+	StartFire();
+}
+
+bool AWeaponBase::ServerStartFire_Validate()
+{
+	return true;
+}
+
 void AWeaponBase::StopFire()
 {
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		ServerStopFire();
+	}
+	
 	if (bShouldFire)
 	{
 		bShouldFire = false;
 		GetWorldTimerManager().ClearTimer(AutoFireTimer);
 	}
+}
+
+void AWeaponBase::ServerStopFire_Implementation()
+{
+	StopFire();
+}
+
+bool AWeaponBase::ServerStopFire_Validate()
+{
+	return true;
 }
 
 void AWeaponBase::Fire()
@@ -74,7 +101,6 @@ void AWeaponBase::Fire()
 
 void AWeaponBase::AutoFireReset()
 {
-	
 	if (WeaponHasAmmo())
 	{
 		//if (WeaponOwner->GetFireButtonPressed())
@@ -136,8 +162,9 @@ void AWeaponBase::SetFireLineTrace()
 		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("LINE TRACE"));
 	UGameplayStatics::ApplyPointDamage(HitActor,
-									/*WeaponMetaData.HitDamage*/ 10,
+									/*WeaponMetaData.HitDamage*/ 10.f,
 									StartTrace,
 									HitResult,
 									GetOwner()->GetInstigatorController(),

@@ -19,19 +19,25 @@ public:
 	// Sets default values for this component's properties
 	UHealthComponent();
 
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	UFUNCTION(Server, Reliable, WithValidation)
 	void HandlePointDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
-
+	
+	/** Property replication */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnHealthChangedSignature OnHealthChanged;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(Replicated)
 	float CurrentHealth;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
