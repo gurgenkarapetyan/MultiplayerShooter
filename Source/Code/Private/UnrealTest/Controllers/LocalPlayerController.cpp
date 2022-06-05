@@ -16,10 +16,10 @@ void ALocalPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// PossessedCharacter = Cast<AUnrealTestCharacter>(GetPoss());
+	// PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
 	
-	PossessedCharacter = Cast<AUnrealTestCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	check(PossessedCharacter);
+	// PossessedCharacter = Cast<AUnrealTestCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	// check(PossessedCharacter);
 }
 
 void ALocalPlayerController::SetupInputComponent()
@@ -75,6 +75,12 @@ void ALocalPlayerController::FireBinding()
 
 void ALocalPlayerController::FireButtonPressed()
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
+	
 	check(PossessedCharacter);
 	check(PossessedCharacter->GetWeapon());
 	PossessedCharacter->GetWeapon()->StartFire();
@@ -82,8 +88,13 @@ void ALocalPlayerController::FireButtonPressed()
 
 void ALocalPlayerController::FireButtonReleased()
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
+	
 	PossessedCharacter->GetWeapon()->StopFire();
-
 }
 
 void ALocalPlayerController::ReloadBinding()
@@ -93,33 +104,67 @@ void ALocalPlayerController::ReloadBinding()
 
 void ALocalPlayerController::Reload()
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	PossessedCharacter->GetEquippedWeapon()->Reload();
 }
 
 void ALocalPlayerController::TurnAtRate(float Rate)
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	// calculate delta for this frame from the rate information
+	check(PossessedCharacter)
+	check(GetWorld())
 	PossessedCharacter->AddControllerYawInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 }
 
 void ALocalPlayerController::LookUpAtRate(float Rate)
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	// calculate delta for this frame from the rate information
+	check(PossessedCharacter)
+	check(GetWorld())
 	PossessedCharacter->AddControllerPitchInput(Rate * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 }
 
 void ALocalPlayerController::Jump()
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	PossessedCharacter->Jump();
 }
 
 void ALocalPlayerController::JumpStop()
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	PossessedCharacter->StopJumping();
 }
 
 void ALocalPlayerController::MoveForward(float Value)
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	if (Value != 0.0f)
 	{
 		// find out which way is forward
@@ -134,6 +179,11 @@ void ALocalPlayerController::MoveForward(float Value)
 
 void ALocalPlayerController::MoveRight(float Value)
 {
+	PossessedCharacter = Cast<AUnrealTestCharacter>(GetPawn());
+	if (!PossessedCharacter)
+	{
+		return;
+	}
 	if (Value != 0.0f)
 	{
 		// find out which way is right
