@@ -23,7 +23,11 @@ public:
 	void MovementBinding();
 	void TurnBinding();
 	void LookUpBinding();
-	void Fire();
+	
+	void FireButtonPressed();
+	void FireButtonReleased();
+
+	void Reload();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -52,6 +56,8 @@ protected:
 	void LookUpAtRate(float Rate);
 
 	void FireBinding();
+
+	void ReloadBinding();
 	
 protected:
 	UPROPERTY()

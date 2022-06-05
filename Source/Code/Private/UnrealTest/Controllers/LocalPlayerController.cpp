@@ -17,7 +17,6 @@ void ALocalPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	// PossessedCharacter = Cast<AUnrealTestCharacter>(GetPoss());
-
 	
 	PossessedCharacter = Cast<AUnrealTestCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	check(PossessedCharacter);
@@ -38,6 +37,7 @@ void ALocalPlayerController::SetupInputComponent()
 	LookUpBinding();
 	
 	FireBinding();
+	ReloadBinding();
 }
 
 void ALocalPlayerController::JumpBinding()
@@ -69,15 +69,31 @@ void ALocalPlayerController::LookUpBinding()
 
 void ALocalPlayerController::FireBinding()
 {
-	InputComponent->BindAction("Fire", IE_Pressed, this, &ALocalPlayerController::Fire);
+	InputComponent->BindAction("Fire", IE_Pressed, this, &ALocalPlayerController::FireButtonPressed);
+	InputComponent->BindAction("Fire", IE_Released, this, &ALocalPlayerController::FireButtonReleased);
 }
 
-
-void ALocalPlayerController::Fire()
+void ALocalPlayerController::FireButtonPressed()
 {
 	check(PossessedCharacter);
 	check(PossessedCharacter->GetWeapon());
-	PossessedCharacter->GetWeapon()->Fire();
+	PossessedCharacter->GetWeapon()->StartFire();
+}
+
+void ALocalPlayerController::FireButtonReleased()
+{
+	PossessedCharacter->GetWeapon()->StopFire();
+
+}
+
+void ALocalPlayerController::ReloadBinding()
+{
+	InputComponent->BindAction("Reload", IE_Pressed, this, &ALocalPlayerController::Reload);
+}
+
+void ALocalPlayerController::Reload()
+{
+	PossessedCharacter->GetEquippedWeapon()->Reload();
 }
 
 void ALocalPlayerController::TurnAtRate(float Rate)

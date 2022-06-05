@@ -25,6 +25,11 @@ public:
 
 	FORCEINLINE AWeaponBase* GetWeapon() const { return Weapon; }
 	
+	FORCEINLINE int32 GetCarriedAmmo() const { return CarriedAmmo; }
+	FORCEINLINE void SetCarriedAmmo(int32 Ammo) { CarriedAmmo = Ammo; }
+
+	FORCEINLINE AWeaponBase* GetEquippedWeapon() const { return Weapon; }
+	
 	void DisableCotrollerRotation();
 	void ConfigureCharacterMovement(class UCharacterMovementComponent* characterMovement);
 	void SetCameraBoom();
@@ -46,16 +51,20 @@ private:
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeaponBase> Weapon_BP;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AWeaponBase> Weapon;
+	
+	/** Ammount of ammo charecter carries. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
+	int32 CarriedAmmo;
 };
 

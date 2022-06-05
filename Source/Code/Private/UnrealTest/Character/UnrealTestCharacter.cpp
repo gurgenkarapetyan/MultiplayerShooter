@@ -12,6 +12,7 @@
 // AUnrealTestCharacter
 
 AUnrealTestCharacter::AUnrealTestCharacter()
+	: CarriedAmmo(85)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -32,7 +33,6 @@ AUnrealTestCharacter::AUnrealTestCharacter()
 void AUnrealTestCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
 
