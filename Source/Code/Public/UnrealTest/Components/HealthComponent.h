@@ -12,18 +12,16 @@ class UNREALTEST_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	// OnHealthChanged event
+	/** OnHealthChanged event */
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_SevenParams(FOnHealthChangedSignature, UHealthComponent*, OwningHealthComp, float, Health, float, HealthDelta, const class UDamageType*, DamageType, FName, BoneName, class AController*, InstigatedBy, AActor*, DamageCauser);
 
 public:
-	// Sets default values for this component's properties
 	UHealthComponent();
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UFUNCTION(Server, Reliable, WithValidation)

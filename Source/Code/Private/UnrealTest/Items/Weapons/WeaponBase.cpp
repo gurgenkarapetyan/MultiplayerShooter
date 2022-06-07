@@ -12,7 +12,6 @@
 #include "UnrealTest/Character/UnrealTestCharacter.h"
 #include "UnrealTest/Controllers/LocalPlayerController.h"
 
-// Sets default values
 AWeaponBase::AWeaponBase()
 	: bShouldFire(false)
 	, AutomaticFireRate(0.1f)
@@ -20,7 +19,6 @@ AWeaponBase::AWeaponBase()
 	, Ammo(30)
 	, MagazineCapacity(30)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	SetReplicates(true);
@@ -37,7 +35,6 @@ AWeaponBase::AWeaponBase()
 	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 }
 
-// Called when the game starts or when spawned
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -103,10 +100,7 @@ void AWeaponBase::AutoFireReset()
 {
 	if (WeaponHasAmmo())
 	{
-		//if (WeaponOwner->GetFireButtonPressed())
-		//{
-			StartFiring();
-		//}
+		StartFiring();
 	}
 	else
 	{
@@ -123,7 +117,6 @@ void AWeaponBase::StartFiring()
 {
 	SetFireLineTrace();
 	PlayFireSoundCue();
-	CreateFireMuzzleFlashParticle();
 	DecrementAmmo();
 	Fire();
 }
@@ -136,61 +129,38 @@ void AWeaponBase::SetFireLineTrace()
 	const FVector EndTrace = Trace.Value;
 
 	FHitResult HitResult(ForceInit);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(),
-										StartTrace,
-										EndTrace,
-										UEngineTypes::ConvertToTraceType(ECC_Visibility),
-										true,
-										{this, GetOwner()},
-										/*FireTraceDebugData.DrawDebugTraceType*/EDrawDebugTrace::ForDuration,
-										HitResult,
-										true,
-										/*FireTraceDebugData.TraceColor*/ FLinearColor::Green,
-										/*FireTraceDebugData.TraceHitColor*/ FLinearColor::Yellow,
-										/*FireTraceDebugData.DrawTime*/ 2.f);
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), StartTrace, EndTrace, UEngineTypes::ConvertToTraceType(ECC_Visibility), true, {this, GetOwner()}, EDrawDebugTrace::ForDuration,HitResult, true,FLinearColor::Green,FLinearColor::Yellow,2.f);
 
 	if (!HitResult.bBlockingHit)
 	{
-		UE_LOG(LogTemp, Log, TEXT("ARangeWeaponBase::FireTrace: Weapon trace hit nothing!"));
 		return;
 	}
 
 	AActor* HitActor = HitResult.GetActor();
 	if (!HitActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ARangeWeaponBase::FireTrace: Didn't hit any actor!"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("LINE TRACE"));
-	UGameplayStatics::ApplyPointDamage(HitActor,
-									/*WeaponMetaData.HitDamage*/ 10.f,
-									StartTrace,
-									HitResult,
-									GetOwner()->GetInstigatorController(),
-									this,
-									/*WeaponMetaData.DamageType*/ {});
+	UGameplayStatics::ApplyPointDamage(HitActor, 10.f, StartTrace, HitResult, GetOwner()->GetInstigatorController(), this, {});
 }
 
 TPair<FVector, FVector> AWeaponBase::GetCameraTrace() const
 {
 	if (!ItemMesh)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ARangeWeaponBase::WeaponTrace: Weapon mesh is null!"));
 		return {};
 	}
 
 	ALocalPlayerController* PlayerController = Cast<ALocalPlayerController>(WeaponOwner->GetController());
 	if (!PlayerController)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ARangeWeaponBase::WeaponTrace: Player controller is null!"));
 		return {};
 	}
 
 	const APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
 	if (!CameraManager)
 	{
-		UE_LOG(LogTemp, Error, TEXT("ARangeWeaponBase::WeaponTrace: Camera manager is null!"));
 		return {};
 	}
 
@@ -198,8 +168,7 @@ TPair<FVector, FVector> AWeaponBase::GetCameraTrace() const
 	const FVector CameraLocation = CameraManager->GetCameraLocation();
 
 	const FVector StartTrace = CameraLocation;
-	// Mesh->GetSocketLocation(Constants::Sockets::Weapons::WEAPON_MUZZLE_FLASH_POINT_NAME);
-	const FVector EndTrace = CameraLocation + CameraForwardVector * /*WeaponMetaData.FireRange*/ 5000;
+	const FVector EndTrace = CameraLocation + CameraForwardVector * 5000;
 
 	return TPair<FVector, FVector>(StartTrace, EndTrace);
 }
@@ -209,18 +178,7 @@ FVector AWeaponBase::GetCameraTraceHitLocation()
 	const TPair<FVector, FVector> CameraTrace = GetCameraTrace();
 
 	FHitResult HitResult(ForceInit);
-	UKismetSystemLibrary::LineTraceSingle(GetWorld(),
-	                                      CameraTrace.Key,
-	                                      CameraTrace.Value,
-	                                      UEngineTypes::ConvertToTraceType(ECC_Visibility),
-	                                      true,
-	                                      {this, GetOwner()},
-	                                      /*FireTraceDebugData.DrawDebugTraceType*/EDrawDebugTrace::None,
-	                                      HitResult,
-	                                      true,
-	                                      /*FireTraceDebugData.TraceColor*/ FLinearColor::Red,
-	                                      /*FireTraceDebugData.TraceHitColor*/ FLinearColor::Blue,
-	                                      /*FireTraceDebugData.DrawTime*/ 2.f);
+	UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraTrace.Key, CameraTrace.Value, UEngineTypes::ConvertToTraceType(ECC_Visibility), true, {this, GetOwner()}, EDrawDebugTrace::None, HitResult, true,FLinearColor::Red, FLinearColor::Blue, 2.f);
 
 	if (!HitResult.bBlockingHit)
 	{
@@ -252,15 +210,6 @@ void AWeaponBase::PlayFireSoundCue()
 	}	
 }
 
-void AWeaponBase::CreateFireMuzzleFlashParticle()
-{
-	const FTransform SocketTransform = GetItemMesh()->GetSocketTransform("Muzzle");
-	if (MuzzleFlash)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);;
-	}
-}
-
 void AWeaponBase::DecrementAmmo()
 {
 	--Ammo;
@@ -277,7 +226,7 @@ void AWeaponBase::Reload()
 		return;
 	}
 
-	int32 CarriedAmmo = WeaponOwner->GetCarriedAmmo(); // 85 
+	int32 CarriedAmmo = WeaponOwner->GetCarriedAmmo(); 
 
 	// Space left in the magazine of EquippedWeapon
 	const int32 MagazineEmptySpace = MagazineCapacity - Ammo;
@@ -306,14 +255,4 @@ void AWeaponBase::ReloadAmmo(int32 Amount)
 bool AWeaponBase::ClipIsFull() const
 {
 	return Ammo >= MagazineCapacity;
-}
-
-void AWeaponBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	
-}
-
-void AWeaponBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	
 }

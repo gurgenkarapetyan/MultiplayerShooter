@@ -29,7 +29,6 @@ void UHealthComponent::BeginPlay()
 
 	if (GetOwnerRole() == ROLE_Authority && ComponentOwner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UHealthComponent::BeginPlay Implementation"));
 		ComponentOwner->OnTakePointDamage.AddDynamic(this, &UHealthComponent::HandlePointDamage);
 	}
 }
@@ -38,7 +37,6 @@ void UHealthComponent::HandlePointDamage_Implementation(AActor* DamagedActor, fl
 	FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection,
 	const UDamageType* DamageType, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Warning, TEXT("HandlePointDamage_Implementation"));
 	if (bInvincible || Damage <= 0.f)
 	{
 		return;

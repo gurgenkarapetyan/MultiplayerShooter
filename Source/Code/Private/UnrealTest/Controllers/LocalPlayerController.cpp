@@ -6,10 +6,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "UnrealTest/Character/UnrealTestCharacter.h"
 
-ALocalPlayerController::ALocalPlayerController()
+ALocalPlayerController::ALocalPlayerController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// set our turn rate for input
-	TurnRateGamepad = TURN_RATE_GAMEPAD;	
+	TurnRateGamepad = TURN_RATE_GAMEPAD;
 }
 
 void ALocalPlayerController::BeginPlay()
@@ -81,9 +82,11 @@ void ALocalPlayerController::FireButtonPressed()
 		return;
 	}
 	
-	check(PossessedCharacter);
-	check(PossessedCharacter->GetWeapon());
-	PossessedCharacter->GetWeapon()->StartFire();
+	if (PossessedCharacter->GetWeapon())
+	{
+		PossessedCharacter->GetWeapon()->StartFire();
+
+	}
 }
 
 void ALocalPlayerController::FireButtonReleased()
@@ -94,7 +97,10 @@ void ALocalPlayerController::FireButtonReleased()
 		return;
 	}
 	
-	PossessedCharacter->GetWeapon()->StopFire();
+	if (PossessedCharacter->GetWeapon())
+	{
+		PossessedCharacter->GetWeapon()->StopFire();
+	}
 }
 
 void ALocalPlayerController::ReloadBinding()
@@ -119,6 +125,7 @@ void ALocalPlayerController::TurnAtRate(float Rate)
 	{
 		return;
 	}
+	
 	// calculate delta for this frame from the rate information
 	check(PossessedCharacter)
 	check(GetWorld())
@@ -132,6 +139,7 @@ void ALocalPlayerController::LookUpAtRate(float Rate)
 	{
 		return;
 	}
+
 	// calculate delta for this frame from the rate information
 	check(PossessedCharacter)
 	check(GetWorld())

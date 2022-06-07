@@ -1,0 +1,28 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UnrealTest/Character/ShooterSpectatorPawn.h"
+
+AShooterSpectatorPawn::AShooterSpectatorPawn(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bReplicates = false;
+}
+
+void AShooterSpectatorPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	check(PlayerInputComponent);
+	
+	PlayerInputComponent->BindAxis("MoveForward", this, &ADefaultPawn::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ADefaultPawn::MoveRight);
+	PlayerInputComponent->BindAxis("MoveUp", this, &ADefaultPawn::MoveUp_World);
+	PlayerInputComponent->BindAxis("Turn", this, &ADefaultPawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("TurnRate", this, &ADefaultPawn::TurnAtRate);
+	PlayerInputComponent->BindAxis("LookUp", this, &ADefaultPawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUpRate", this, &AShooterSpectatorPawn::LookUpAtRate);
+}
+
+void AShooterSpectatorPawn::LookUpAtRate(float Val)
+{
+	AddControllerPitchInput(Val * BaseLookUpRate * GetWorld()->GetDeltaSeconds() * CustomTimeDilation);
+}

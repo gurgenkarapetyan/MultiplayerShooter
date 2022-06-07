@@ -16,7 +16,7 @@ class UNREALTEST_API ALocalPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	ALocalPlayerController();
+	ALocalPlayerController(const FObjectInitializer& ObjectInitializer);
 	
 	void Jump();
 	void JumpStop();

@@ -34,15 +34,14 @@ public:
 	void ConfigureCharacterMovement(class UCharacterMovementComponent* characterMovement);
 	void SetCameraBoom();
 	void SetFollowCamera();
-
+	
+	
+	/** Update the team color of all player meshes. */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateTeamColors(int32 TeamColor);
+	
 	/** Property replication */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	const float JUMP_Z_VELOCITY= 700.f;
-	const float AIR_CONTROL = 0.35f;
-	const float MAX_WALK_SPEED = 500.f;
-	const float MIN_ANALOG_WALK_SPEED = 20.f;
-	const float BRAKING_DECELERATION_WALKING = 2000.f;
 
 protected:
 	UFUNCTION()
@@ -59,15 +58,21 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UHealthComponent> HealthComponent;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	TSubclassOf<AWeaponBase> Weapon_BP;
 
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AWeaponBase> Weapon;
 	
-	/** Ammount of ammo charecter carries. */
+	/** Amount of ammo charecter carries. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ammo", meta = (AllowPrivateAccess = "true"))
 	int32 CarriedAmmo;
+
+	const float JUMP_Z_VELOCITY= 700.f;
+	const float AIR_CONTROL = 0.35f;
+	const float MAX_WALK_SPEED = 500.f;
+	const float MIN_ANALOG_WALK_SPEED = 20.f;
+	const float BRAKING_DECELERATION_WALKING = 2000.f;
 };
 
